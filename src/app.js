@@ -101,7 +101,7 @@ export function setupApp() {
     .data(graph.nodes)
     .join((enter) => {
       const g = enter.append("g").attr("class", "node");
-      g.append("circle").attr("r", RADIUS);
+      g.append("circle").attr("r", (d) => d.value + RADIUS);
       g.append("text")
         .attr("text-anchor", "middle")
         .attr("dy", "0.35em")
