@@ -4,8 +4,19 @@ const width = document.body.clientWidth;
 const height = document.body.clientHeight;
 
 const uuid = Uuid();
+
+const newNode = (value) => {
+  return {
+    id: uuid.gen(),
+    value,
+    left: null,
+    right: null,
+    red: false,
+  };
+};
+
 const bst = (arr) => {
-  const root = { id: uuid.gen(), value: arr[0], left: null, right: null };
+  const root = newNode(arr[0]);
   for (let i = 1; i < arr.length; i++) {
     insert(root, arr[i]);
   }
@@ -15,7 +26,7 @@ const bst = (arr) => {
 const insert = (node, value) => {
   if (value < node.value) {
     if (node.left === null) {
-      node.left = { id: uuid.gen(), value, left: null, right: null };
+      node.left = newNode(value);
     } else {
       insert(node.left, value);
     }
@@ -23,7 +34,7 @@ const insert = (node, value) => {
   }
   if (value > node.value) {
     if (node.right === null) {
-      node.right = { id: uuid.gen(), value, left: null, right: null };
+      node.right = newNode(value);
     } else {
       insert(node.right, value);
     }
@@ -97,7 +108,7 @@ export function setupApp() {
           .text((d) => d.value ?? "");
         return g;
       })
-      .classed("fixed", (d) => d.fx !== undefined);
+      .classed("red", (d) => d.red);
 
   const simulation = d3
     .forceSimulation()
@@ -106,13 +117,22 @@ export function setupApp() {
     .force("center", d3.forceCenter(width / 2, height / 2))
     .force(
       "link",
-      d3.forceLink(graph.links).id((d) => d.id),
+      d3
+        .forceLink(graph.links)
+        .id((d) => d.id)
+        .distance(50),
     )
-    .on("tick", tick);
+    .stop();
+  for (let i = 0; i < 300; i++) simulation.tick();
+  tick();
 
   const drag = d3.drag().on("start", dragstart).on("drag", dragged);
 
-  node.call(drag).on("click", click);
+  node
+    .call(drag)
+    .on("click", toggleRed)
+    .on("mouseover", hover)
+    .on("mouseout", unhover);
 
   function tick() {
     link
@@ -120,25 +140,30 @@ export function setupApp() {
       .attr("y1", (d) => d.source.y)
       .attr("x2", (d) => d.target.x)
       .attr("y2", (d) => d.target.y);
-    node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
     node.attr("transform", (d) => `translate(${d.x},${d.y})`);
   }
 
-  function click(event, d) {
-    delete d.fx;
-    delete d.fy;
-    d3.select(this).classed("fixed", false);
-    simulation.alpha(1).restart();
+  function toggleRed(_, d) {
+    d.red = !d.red;
+    d3.select(this).classed("red", (d) => d.red);
+  }
+
+  function hover(_, d) {
+    d3.select(this).classed("hover", true);
+  }
+
+  function unhover(_, d) {
+    d3.select(this).classed("hover", false);
   }
 
   function dragstart() {
-    d3.select(this).classed("fixed", true);
+    return;
   }
 
   function dragged(event, d) {
-    d.fx = clamp(event.x, 0, width);
-    d.fy = clamp(event.y, 0, height);
-    simulation.alpha(1).restart();
+    d.x = clamp(event.x, 0, width);
+    d.y = clamp(event.y, 0, height);
+    tick();
   }
   return svg.node();
 }

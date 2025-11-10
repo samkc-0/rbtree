@@ -10,15 +10,6 @@ svg {
   height: 100vh;
   display: block;
 }
-.link {
-  stroke: #aaa;
-}
-.node {
-  fill: steelblue;
-}
-.node.fixed {
-  fill: orange;
-}
 
 .link {
   stroke: #000;
@@ -32,13 +23,27 @@ svg {
   stroke-width: 1.5px;
 }
 
-.node.fixed {
-  fill: #f00;
+.node.red {
+  fill: #d00;
 }
 
-.node text {
+.node text,
+.node.red text {
   font-size: 23px;
   fill: white;
   font-weight: bold;
   pointer-events: none;
+}
+
+.node.hover {
+  fill: #222;
+  stroke: white;
+}
+.node.hover text {
+  stroke: none;
+}
+
+.node.red.hover {
+  fill: #f00;
+  stroke: white;
 }
