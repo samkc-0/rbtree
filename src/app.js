@@ -130,10 +130,10 @@ export function setupApp() {
 
   node
     .call(drag)
-    .on("click", toggleRed)
+    .on("dblclick", toggleRed)
     .on("mouseover", hover)
     .on("mouseout", unhover)
-    .on("dblclick", addLink);
+    .on("click", addLink);
 
   link.on("dblclick", cut);
   function cut(_, l) {
@@ -217,12 +217,11 @@ export function setupApp() {
       .selectAll(".link")
       .data(graph.links, (d) => d.id)
       .join(
-        (enter) =>
-          enter.append("line").classed("link", true).on("dblclick", cut),
+        (enter) => enter.append("line").classed("link", true).on("click", cut),
         (update) => update,
         (exit) => exit.remove(),
       );
-
+    link.lower();
     simulation.force("link").links(graph.links);
     tick();
   }
