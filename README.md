@@ -7,4 +7,6 @@ So far you can:
 
 (It's far from finished)
 
+Clone the repo and run `bun dev` to use it.
+
 <img width="847" height="554" alt="Captura de pantalla 2025-11-10 a la(s) 18 35 19" src="https://github.com/user-attachments/assets/82f5ddfa-7b82-4aee-80ed-a4b2ab8afebb" />
