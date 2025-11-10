@@ -1,5 +1,7 @@
 A sandbox for playing with [red-black trees](https://www.wikiwand.com/en/articles/Red%E2%80%93black_tree), to develop intuition about how they work.
 
+## Features
+
 So far you can:
  - add edges
  - remove edges
@@ -8,10 +10,10 @@ So far you can:
 
 ## Controls
 
-Double-clicking an edge removes it.
-To add an edge, click on a node, then another.
-To toggle a node between red and black, double-click on it.
-Nodes can be moved by dragging them around.
+- Double-clicking an edge removes it.
+- To add an edge, click on a node, then another.
+- To toggle a node between red and black, double-click on it.
+- Nodes can be moved by dragging them around.
 
 (It's far from finished)
 
