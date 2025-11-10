@@ -1,3 +1,12 @@
+:root {
+  --edge-color: #969a97;
+  --edge-hover: #d6d1cd;
+  --node-text: #e5ece9;
+  --red: #d5202f;
+  --red-hover: #df2a39;
+  --black: #100b00;
+  --black-hover: #291c00;
+}
 html,
 body {
   margin: 0;
@@ -12,19 +21,26 @@ svg {
 }
 
 .link {
-  stroke: #000;
-  stroke-width: 1.5px;
+  stroke: var(--edge-color);
+  stroke-width: 4px;
+  z-index: 10;
+}
+.link:hover {
+  stroke: var(--edge-hover);
+  stroke-width: 6px;
 }
 
 .node {
   cursor: move;
-  fill: #000;
+  fill: var(--black);
   stroke: none;
   stroke-width: 1.5px;
 }
 
 .node.red {
-  fill: #d00;
+  fill: var(--red);
+  stroke: none;
+  stroke-width: 1.5px;
 }
 
 .node text,
@@ -36,14 +52,13 @@ svg {
 }
 
 .node.hover {
-  fill: #222;
-  stroke: white;
+  fill: var(--black-hover);
+  stroke: var(--node-text);
 }
 .node.hover text {
   stroke: none;
 }
 
 .node.red.hover {
-  fill: #f00;
-  stroke: white;
+  fill: var(--red-hover);
 }

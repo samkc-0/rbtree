@@ -2,7 +2,7 @@ import * as d3 from "d3";
 
 const width = document.body.clientWidth;
 const height = document.body.clientHeight;
-
+const RADIUS = 24;
 const uuid = Uuid();
 
 const newNode = (value) => {
@@ -55,13 +55,13 @@ const traverse = (node, callback) => {
 };
 
 const makeLinks = (node) => {
-  const links = [];
+  let links = [];
   traverse(node, (n) => {
     if (n.left !== null) {
-      links.push({ source: n.id, target: n.left.id });
+      links.push({ id: uuid.gen(), source: n.id, target: n.left.id });
     }
     if (n.right !== null) {
-      links.push({ source: n.id, target: n.right.id });
+      links.push({ id: uuid.gen(), source: n.id, target: n.right.id });
     }
   });
   return links;
@@ -71,7 +71,7 @@ const makeGraph = (values) => {
   const root = bst(values);
   const nodes = [];
   traverse(root, (n) => nodes.push(n));
-  const links = makeLinks(root);
+  let links = makeLinks(root);
   return { nodes, links };
 };
 
@@ -90,25 +90,25 @@ function clamp(x, lo, hi) {
 }
 
 export function setupApp() {
-  const svg = d3.create("svg").attr("viewBox", [0, 0, width, height]),
-    link = svg
-      .selectAll(".link")
-      .data(graph.links)
-      .join("line")
-      .classed("link", true),
-    node = svg
-      .selectAll(".node")
-      .data(graph.nodes)
-      .join((enter) => {
-        const g = enter.append("g").attr("class", "node");
-        g.append("circle").attr("r", 20);
-        g.append("text")
-          .attr("text-anchor", "middle")
-          .attr("dy", "0.35em")
-          .text((d) => d.value ?? "");
-        return g;
-      })
-      .classed("red", (d) => d.red);
+  const svg = d3.create("svg").attr("viewBox", [0, 0, width, height]);
+  let link = svg
+    .selectAll(".link")
+    .data(graph.links)
+    .join("line")
+    .classed("link", true);
+  let node = svg
+    .selectAll(".node")
+    .data(graph.nodes)
+    .join((enter) => {
+      const g = enter.append("g").attr("class", "node");
+      g.append("circle").attr("r", RADIUS);
+      g.append("text")
+        .attr("text-anchor", "middle")
+        .attr("dy", "0.35em")
+        .text((d) => d.value ?? "");
+      return g;
+    })
+    .classed("red", (d) => d.red);
 
   const simulation = d3
     .forceSimulation()
@@ -120,7 +120,7 @@ export function setupApp() {
       d3
         .forceLink(graph.links)
         .id((d) => d.id)
-        .distance(50),
+        .distance(200),
     )
     .stop();
   for (let i = 0; i < 300; i++) simulation.tick();
@@ -132,7 +132,53 @@ export function setupApp() {
     .call(drag)
     .on("click", toggleRed)
     .on("mouseover", hover)
-    .on("mouseout", unhover);
+    .on("mouseout", unhover)
+    .on("dblclick", addLink);
+
+  link.on("dblclick", cut);
+  function cut(_, l) {
+    graph.links = graph.links.filter(({ id }) => l.id !== id);
+    refreshLinks();
+  }
+  var pendingNode = null;
+  var timeout = null;
+  function addLink(_, d) {
+    if (pendingNode) {
+      if (linkExists(pendingNode.id, d.id)) {
+        return;
+      }
+      console.log(`... linked ${pendingNode.id} to ${d.id}.`);
+      const newLink = {
+        id: uuid.gen(),
+        source: pendingNode.id,
+        target: d.id,
+      };
+      graph.links = [...graph.links, newLink];
+      pendingNode = null;
+      timeout && clearTimeout(timeout);
+      refreshLinks();
+      return;
+    }
+    console.log(`Adding link from ${d.id}...`);
+    pendingNode = d;
+    timeout = setTimeout(() => {
+      pendingNode = null;
+    }, 2000);
+  }
+
+  function linkExists(source, target) {
+    const sid = typeof source === "object" ? source.id : source;
+    const tid = typeof target === "object" ? target.id : target;
+    const exists = graph.links.some(
+      (l) =>
+        (l.source.id === sid && l.target.id === tid) ||
+        (l.source.id === tid && l.target.id === sid),
+    );
+    if (exists) {
+      console.log(`Link already exists: ${sid} -> ${tid}. Cancelled.`);
+    }
+    return exists;
+  }
 
   function tick() {
     link
@@ -165,6 +211,22 @@ export function setupApp() {
     d.y = clamp(event.y, 0, height);
     tick();
   }
+
+  function refreshLinks() {
+    link = svg
+      .selectAll(".link")
+      .data(graph.links, (d) => d.id)
+      .join(
+        (enter) =>
+          enter.append("line").classed("link", true).on("dblclick", cut),
+        (update) => update,
+        (exit) => exit.remove(),
+      );
+
+    simulation.force("link").links(graph.links);
+    tick();
+  }
+
   return svg.node();
 }
 
