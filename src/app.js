@@ -140,29 +140,29 @@ export function setupApp() {
     graph.links = graph.links.filter(({ id }) => l.id !== id);
     refreshLinks();
   }
-  var pendingNode = null;
+  var selectedNode = null;
   var timeout = null;
   function addLink(_, d) {
-    if (pendingNode) {
-      if (linkExists(pendingNode.id, d.id)) {
+    if (selectedNode) {
+      if (linkExists(selectedNode.id, d.id)) {
         return;
       }
-      console.log(`... linked ${pendingNode.id} to ${d.id}.`);
+      console.log(`... linked ${selectedNode.id} to ${d.id}.`);
       const newLink = {
         id: uuid.gen(),
-        source: pendingNode.id,
+        source: selectedNode.id,
         target: d.id,
       };
       graph.links = [...graph.links, newLink];
-      pendingNode = null;
+      selectedNode = null;
       timeout && clearTimeout(timeout);
       refreshLinks();
       return;
     }
     console.log(`Adding link from ${d.id}...`);
-    pendingNode = d;
+    selectedNode = d;
     timeout = setTimeout(() => {
-      pendingNode = null;
+      selectedNode = null;
     }, 2000);
   }
 
