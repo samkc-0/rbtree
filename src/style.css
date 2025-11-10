@@ -53,12 +53,27 @@ svg {
 
 .node.hover {
   fill: var(--black-hover);
-  stroke: var(--node-text);
+  stroke: var(--black-hover);
+  stroke-width: 3px;
 }
 .node.hover text {
   stroke: none;
 }
 
 .node.red.hover {
+  stroke: var(--red-hover);
   fill: var(--red-hover);
+}
+
+.node.selected,
+.node.selected:hover,
+.node.red.selected:hover {
+  stroke-width: 3px;
+  stroke: gold;
+  fill: peru;
+}
+
+.node.selected text {
+  stroke: none;
+  fill: gold;
 }

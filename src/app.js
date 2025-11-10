@@ -75,7 +75,7 @@ const makeGraph = (values) => {
   return { nodes, links };
 };
 
-const values = Array.from({ length: 13 }, (_, i) => i);
+const values = Array.from({ length: 10 }, (_, i) => i);
 const shuffle = (arr) => {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -89,26 +89,35 @@ function clamp(x, lo, hi) {
   return x < lo ? lo : x > hi ? hi : x;
 }
 
+let scene = { node: null, link: null, simulation: null };
+
 export function setupApp() {
+  let selectedNode = null;
+  let timeout = null;
+
   const svg = d3.create("svg").attr("viewBox", [0, 0, width, height]);
   let link = svg
     .selectAll(".link")
     .data(graph.links)
     .join("line")
     .classed("link", true);
-  let node = svg
-    .selectAll(".node")
-    .data(graph.nodes)
-    .join((enter) => {
-      const g = enter.append("g").attr("class", "node");
-      g.append("circle").attr("r", (d) => d.value + RADIUS);
-      g.append("text")
-        .attr("text-anchor", "middle")
-        .attr("dy", "0.35em")
-        .text((d) => d.value ?? "");
-      return g;
-    })
-    .classed("red", (d) => d.red);
+  function getNode() {
+    return svg
+      .selectAll(".node")
+      .data(graph.nodes)
+      .join((enter) => {
+        const g = enter.append("g").attr("class", "node");
+        g.append("circle").attr("r", (d) => d.value + RADIUS);
+        g.append("text")
+          .attr("text-anchor", "middle")
+          .attr("dy", "0.35em")
+          .text((d) => d.value ?? "");
+        return g;
+      })
+      .classed("red", (d) => d.red)
+      .classed("selected", (d) => d.id === selectedNode?.id);
+  }
+  let node = getNode();
 
   const simulation = d3
     .forceSimulation()
@@ -140,11 +149,10 @@ export function setupApp() {
     graph.links = graph.links.filter(({ id }) => l.id !== id);
     refreshLinks();
   }
-  var selectedNode = null;
-  var timeout = null;
   function addLink(_, d) {
     if (selectedNode) {
       if (linkExists(selectedNode.id, d.id)) {
+        deselect();
         return;
       }
       console.log(`... linked ${selectedNode.id} to ${d.id}.`);
@@ -154,16 +162,24 @@ export function setupApp() {
         target: d.id,
       };
       graph.links = [...graph.links, newLink];
-      selectedNode = null;
+      deselect();
       timeout && clearTimeout(timeout);
       refreshLinks();
       return;
     }
     console.log(`Adding link from ${d.id}...`);
-    selectedNode = d;
+    select(d);
     timeout = setTimeout(() => {
-      selectedNode = null;
+      deselect();
     }, 2000);
+  }
+  function select(d) {
+    selectedNode = d;
+    node = getNode();
+  }
+  function deselect() {
+    selectedNode = null;
+    node = getNode();
   }
 
   function linkExists(source, target) {
