@@ -1,10 +1,17 @@
 A sandbox for playing with [red-black trees](https://www.wikiwand.com/en/articles/Red%E2%80%93black_tree), to develop intuition about how they work.
 
 So far you can:
- - add edges (click the first node, then the second to link them)
- - remove adges (double-click on an edge)
- - move nodes around (drag)
- - toggle red/black status. (double-click on a node)
+ - add edges
+ - remove edges
+ - move nodes around
+ - toggle red/black property. (double-click on a node)
+
+## Controls
+
+Double-clicking an edge removes it.
+To add an edge, click on a node, then another.
+To toggle a node between red and black, double-click on it.
+Nodes can be moved by dragging them around.
 
 (It's far from finished)
 
