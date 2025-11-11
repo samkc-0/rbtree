@@ -70,4 +70,10 @@ app-example
 # generated native folders
 /ios
 /android
+<<<<<<< HEAD
 >>>>>>> 3206058 (Initial commit)
+=======
+
+# backup
+.backup
+>>>>>>> e77f169 (move to react native)
