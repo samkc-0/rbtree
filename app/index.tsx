@@ -1,9 +1,10 @@
+import { View } from "react-native";
 import RedBlackTrees from "@/components/app";
 
 export default function Index() {
   return (
-    <svg>
+    <View>
       <RedBlackTrees />
-    </svg>
+    </View>
   );
 }
