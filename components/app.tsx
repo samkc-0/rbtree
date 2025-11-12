@@ -1,15 +1,16 @@
 import { View, Dimensions } from "react-native";
 import { useEffect, useMemo, useState } from "react";
-import BST from "./bst";
+import { StyleSheet } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Svg, { G, Line } from "react-native-svg";
 import { forceSimulation, forceLink, forceManyBody, forceCenter } from "d3";
-import "./app.css";
-import Svg, { G, Line, Circle, Text as SvgText } from "react-native-svg";
-
-type Props = { values: number[] };
-
-const bst = BST();
-
-const baseNodeRadius = 24;
+import Vertex from "@/components/vertex";
+import BST from "./bst";
+import Animated, {
+  useSharedValue,
+  withTiming,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 
 function useWindowSize() {
   const [size, setSize] = useState(Dimensions.get("window"));
@@ -23,9 +24,17 @@ function useWindowSize() {
   return size;
 }
 
+const bst = BST();
+
+const baseRadius = 24;
+
+type Props = {
+  values: number[];
+};
+
 export function Graph({ values }: Props) {
   const { width, height } = useWindowSize();
-  const { nodes, links } = useMemo(() => {
+  const graph = useMemo(() => {
     let { nodes, links } = bst.makeGraph(values);
     const sim = forceSimulation(nodes as any)
       .force(
@@ -41,55 +50,80 @@ export function Graph({ values }: Props) {
     for (let i = 0; i < 300; i++) sim.tick();
     return { nodes, links };
   }, []);
-
+  const [nodes, setNodes] = useState(graph.nodes);
+  const [links, setLinks] = useState(graph.links);
+  const [draggingNode, setDraggingNode] = useState<{ id: number }>(undefined);
+  const onDrag = Gesture.Pan()
+    .onStart((e) => {
+      // check which node is being dragged
+      const node = nodes.find((n) => distance(n, e) <= baseRadius + n.value);
+      if (!node) return;
+      setDraggingNode(node);
+    })
+    .onUpdate((e) => {
+      if (!draggingNode) return;
+      setNodes((nodes) =>
+        nodes.map((n) => {
+          if (n.id === draggingNode.id) {
+            return { ...n, x: e.x, y: e.y };
+          }
+          return n;
+        }),
+      );
+    })
+    .onEnd(() => {})
+    .runOnJS(true);
   return (
-    <View>
-      <Svg width={width} height={height}>
-        <G>
-          {/* Links */}
-          {links.map(({ id, source, target }) => {
-            const s = nodes.find((n) => n.id === source.id || n.id === source);
-            const t = nodes.find((n) => n.id === target.id || n.id === target);
-            if (!s || !t) return null;
-            return (
-              <Line
-                key={id}
-                x1={s.x!}
-                y1={s.y!}
-                x2={t.x!}
-                y2={t.y!}
-                stroke="#999"
-                strokeOpacity={0.7}
-                strokeWidth={4}
-              />
-            );
-          })}
-          {/* Nodes */}
-          {nodes.map((d) => {
-            return (
-              <G key={d.id}>
-                <Circle
-                  cx={d.x!}
-                  cy={d.y!}
-                  r={d.value + baseNodeRadius}
-                  fill="black"
+    <GestureDetector gesture={onDrag}>
+      <View>
+        <Svg width={width} height={height}>
+          <G>
+            {/* Links */}
+            {links.map(({ id, source, target }) => {
+              const s = nodes.find(
+                (n) => n.id === source.id || n.id === source,
+              );
+              const t = nodes.find(
+                (n) => n.id === target.id || n.id === target,
+              );
+              if (!s || !t) return null;
+              return (
+                <Line
+                  key={id}
+                  x1={s.x!}
+                  y1={s.y!}
+                  x2={t.x!}
+                  y2={t.y!}
+                  stroke="#999"
+                  strokeOpacity={0.7}
+                  strokeWidth={4}
                 />
-                <SvgText
-                  x={d.x!}
-                  y={d.y!}
-                  fontSize={24}
-                  textAnchor="middle"
-                  alignmentBaseline="central"
-                  fill="white"
-                  fontFamily="sans-serif"
-                >
-                  {d.value}
-                </SvgText>
-              </G>
-            );
-          })}
-        </G>
-      </Svg>
-    </View>
+              );
+            })}
+            {/* Nodes */}
+            {nodes.map(({ id, x, y, value }) => (
+              <Vertex key={id} x={x!} y={y!} value={value} />
+            ))}
+          </G>
+        </Svg>
+      </View>
+    </GestureDetector>
   );
+}
+
+const styles = StyleSheet.create({
+  hitbox: {
+    position: "absolute",
+    height: 120,
+    width: 120,
+    backgroundColor: "#b58df1",
+    borderRadius: 20,
+    marginBottom: 30,
+  },
+});
+
+type Point = Required<{ x: number; y: number }>;
+
+function distance(a: Point, b: Point) {
+  return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 }
