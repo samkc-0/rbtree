@@ -11,18 +11,7 @@ import Animated, {
   withTiming,
   useAnimatedStyle,
 } from "react-native-reanimated";
-
-function useWindowSize() {
-  const [size, setSize] = useState(Dimensions.get("window"));
-  useEffect(() => {
-    const onChange = ({ window }: any) => {
-      setSize(window);
-    };
-    const sub = Dimensions.addEventListener("change", onChange);
-    return () => sub?.remove();
-  }, []);
-  return size;
-}
+import useWindowSize from "@/hooks/use-window-size";
 
 const bst = BST();
 
@@ -52,7 +41,9 @@ export function Graph({ values }: Props) {
   }, []);
   const [nodes, setNodes] = useState(graph.nodes);
   const [links, setLinks] = useState(graph.links);
-  const [draggingNode, setDraggingNode] = useState<{ id: number }>(undefined);
+  const [draggingNode, setDraggingNode] = useState<{ id: number } | undefined>(
+    undefined,
+  );
   const onDrag = Gesture.Pan()
     .onStart((e) => {
       // check which node is being dragged
@@ -71,8 +62,9 @@ export function Graph({ values }: Props) {
         }),
       );
     })
-    .onEnd(() => {})
-    .runOnJS(true);
+    .onEnd(() => {
+      setDraggingNode(undefined);
+    });
   return (
     <GestureDetector gesture={onDrag}>
       <View>
