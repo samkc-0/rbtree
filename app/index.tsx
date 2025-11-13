@@ -1,4 +1,3 @@
-import { View } from "react-native";
 import { Graph } from "@/components/app";
 import shuffle from "@/util/shuffle";
 import { GestureHandlerRootView } from "react-native-gesture-handler";

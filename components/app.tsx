@@ -12,6 +12,7 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 import useWindowSize from "@/hooks/use-window-size";
+import { scheduleOnRN } from "react-native-worklets";
 
 const bst = BST();
 
@@ -46,24 +47,13 @@ export function Graph({ values }: Props) {
   );
   const onDrag = Gesture.Pan()
     .onStart((e) => {
-      // check which node is being dragged
-      const node = nodes.find((n) => distance(n, e) <= baseRadius + n.value);
-      if (!node) return;
-      setDraggingNode(node);
+      // work out which *svg circle* is being dragged
     })
     .onUpdate((e) => {
-      if (!draggingNode) return;
-      setNodes((nodes) =>
-        nodes.map((n) => {
-          if (n.id === draggingNode.id) {
-            return { ...n, x: e.x, y: e.y };
-          }
-          return n;
-        }),
-      );
+      // update the *svg circle position.
     })
     .onEnd(() => {
-      setDraggingNode(undefined);
+      // update the *data*
     });
   return (
     <GestureDetector gesture={onDrag}>
