@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Dimensions } from "react-native";
 
-export default function useWindowSize() {
+export function useWindowSize() {
   const [size, setSize] = useState(Dimensions.get("window"));
   useEffect(() => {
     const onChange = ({ window }: any) => {
