@@ -1,6 +1,13 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "types": [
+      "@types/react",
+      "@types/react-native",
+      "@types/three",
+      "@react-three/fiber",
+      "@react-three/fiber/jsx-runtime"
+    ],
     "strict": true,
     "paths": {
       "@/*": [

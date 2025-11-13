@@ -1,18 +1,6 @@
-import { View, Dimensions } from "react-native";
-import { useEffect, useMemo, useState } from "react";
-import { StyleSheet } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Svg, { G, Line } from "react-native-svg";
 import { forceSimulation, forceLink, forceManyBody, forceCenter } from "d3";
-import Vertex from "@/components/vertex";
 import BST from "./bst";
-import Animated, {
-  useSharedValue,
-  withTiming,
-  useAnimatedStyle,
-} from "react-native-reanimated";
 import useWindowSize from "@/hooks/use-window-size";
-import { scheduleOnRN } from "react-native-worklets";
 
 const bst = BST();
 
@@ -42,24 +30,8 @@ export function Graph({ values }: Props) {
   }, []);
   const [nodes, setNodes] = useState(graph.nodes);
   const [links, setLinks] = useState(graph.links);
-  const [draggingNode, setDraggingNode] = useState<{ id: number } | undefined>(
-    undefined,
-  );
-  const onDrag = Gesture.Pan()
-    .onStart((e) => {
-      // work out which *svg circle* is being dragged
-    })
-    .onUpdate((e) => {
-      // update the *svg circle position.
-    })
-    .onEnd(() => {
-      // update the *data*
-    });
   return (
-    <GestureDetector gesture={onDrag}>
-      <View>
-        <Svg width={width} height={height}>
-          <G>
+      <group>
             {/* Links */}
             {links.map(({ id, source, target }) => {
               const s = nodes.find(
@@ -89,7 +61,7 @@ export function Graph({ values }: Props) {
           </G>
         </Svg>
       </View>
-    </GestureDetector>
+    </group>
   );
 }
 
