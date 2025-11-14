@@ -1,10 +1,8 @@
-import { useState } from "react";
-import * as THREE from "three";
-import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { Vector3 } from "three";
 import type { VertexType, EdgeType } from "@/types/graph";
+import { Line } from "@react-three/drei/native";
 
-const BASE_RADIUS = 4;
+const BASE_RADIUS = 6;
 
 type GraphProps = {
   vertices: VertexType[];
@@ -22,64 +20,47 @@ function Vertex2D({
 }: Omit<VertexType, "uuid">) {
   const r = value + BASE_RADIUS;
   return (
-    <mesh position={[x, y, z]} rotation={[Math.PI / 2, 0, 0]}>
-      <cylinderGeometry args={[r, r + 1, 2]} />
-      <meshBasicMaterial color={nodeColor} />
-    </mesh>
+    <object3D position={[x, y, z]}>
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[r, r, 5]} />
+        <meshBasicMaterial color={nodeColor} />
+      </mesh>
+    </object3D>
   );
 }
 
-type LineProps = {
-  start: THREE.Vector3;
-  end: THREE.Vector3;
-  color?: string;
-};
-
-function Line({ start, end, color = "hotpink" }: LineProps) {
-  const ref = useRef<any>(undefined);
-  useFrame(() => {
-    if (!ref.current) return;
-    ref.current.geometry.setFromPoints([start, end]);
-  });
-  return (
-    <line ref={ref}>
-      <bufferGeometry />
-      <lineBasicMaterial color={color} />
-    </line>
-  );
-}
-
-export function Graph2D(props: GraphProps) {
-  const [vertices, setVertices] = useState<VertexType[]>(props.vertices);
-  const [edges, setEdges] = useState<EdgeType[]>(props.edges);
-  const { position } = props;
+export function Graph2D({ vertices, edges, position }: GraphProps) {
   return (
     <group>
-      {vertices.map((v, i) => (
-        <group key={v.uuid || i}>
-          <Vertex2D
-            x={v.x}
-            y={v.y}
-            z={props.position.z}
-            value={v.value}
-            nodeColor={v.nodeColor}
-            textColor={v.textColor}
-          />
-        </group>
+      {vertices.map((v) => (
+        <Vertex2D
+          key={v.uuid}
+          x={v.x}
+          y={v.y}
+          z={position.z}
+          value={v.value}
+          nodeColor={v.nodeColor}
+          textColor={v.textColor}
+        />
       ))}
 
-      {edges.map((e, i) => {
-        console.log(e);
+      {edges.map((e) => {
         const source = vertices.find((v) => v.uuid === e.source);
-        if (!source) return;
+        if (!source) throw new Error(`bady formed edge: ${e}`);
+
         const target = vertices.find((v) => v.uuid === e.target)!;
-        if (!target) return;
-        const start = new THREE.Vector3(source.x, source.y, position.z);
-        const end = new THREE.Vector3(target.x, target.y, position.z);
+        if (!target) throw new Error(`bady formed edge: ${e}`);
+
+        const start = new Vector3(source.x, source.y, position.z);
+        const end = new Vector3(target.x, target.y, position.z);
+
         return (
-          <object3D key={e.uuid || i}>
-            <Line start={start} end={end} color={e.color} />
-          </object3D>
+          <Line
+            key={e.uuid}
+            points={[start, end]}
+            color={"black"}
+            lineWidth={5}
+          />
         );
       })}
     </group>

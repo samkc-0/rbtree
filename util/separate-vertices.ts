@@ -5,7 +5,6 @@ export default function spaceGraph(
   graph: GraphType,
   width: number,
   height: number,
-  distance: number,
 ): VertexType[] {
   let { vertices } = graph;
   const sim = forceSimulation(vertices as any)
@@ -14,7 +13,11 @@ export default function spaceGraph(
     .stop();
 
   for (let i = 0; i < 300; i++) sim.tick();
+  vertices = normalizeD3CoordsToThreeCamera(vertices);
+  return vertices;
+}
 
+export function normalizeD3CoordsToThreeCamera(vertices: VertexType[]) {
   // nomalize to three js
   const X = vertices.map(({ x }) => x);
   const Y = vertices.map(({ y }) => y);
@@ -50,6 +53,5 @@ export default function spaceGraph(
     v.x = normalized.x;
     v.y = -normalized.y;
   });
-
   return vertices;
 }
