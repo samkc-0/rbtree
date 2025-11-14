@@ -3,7 +3,11 @@ import { Graph2D } from "@/components/graph";
 import { Canvas } from "@react-three/fiber/native";
 import { useMemo } from "react";
 import { useWindowSize } from "../hooks/use-window-size";
-import { OrbitControls, OrthographicCamera } from "@react-three/drei/native";
+import {
+  OrbitControls,
+  OrthographicCamera,
+  Bounds,
+} from "@react-three/drei/native";
 
 import shuffle from "@/util/shuffle";
 import BinarySearchTree from "@/util/bst";
@@ -34,11 +38,13 @@ export default function Index() {
           far={2000}
           position={[0, 0, 200]}
         />
-        <Graph2D
-          vertices={vertices}
-          edges={edges}
-          position={{ x: 0, y: 0, z: 0 }}
-        />
+        <Bounds fit clip observe margin={1.2}>
+          <Graph2D
+            vertices={vertices}
+            edges={edges}
+            position={{ x: 0, y: 0, z: 0 }}
+          />
+        </Bounds>
         <OrbitControls />
         <color attach="background" args={["#f0f0f0"]} />
       </Canvas>
