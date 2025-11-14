@@ -22,7 +22,6 @@ function Vertex2D({
     <mesh position={[x, y, z]}>
       <sphereGeometry args={[value, 32, 32]} />
       <meshBasicMaterial color={nodeColor} />
-      <meshBasicMaterial attach="material" color={textColor} />
     </mesh>
   );
 }

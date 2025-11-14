@@ -25,7 +25,7 @@ export default function Index() {
         <Graph2D
           vertices={vertices}
           edges={edges}
-          position={{ x: 0, y: 0, z: -5 }}
+          position={{ x: 0, y: 0, z: -500 }}
         />
       </Canvas>
     </View>
