@@ -21,8 +21,8 @@ export default function Index() {
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
-      <Canvas camera={{ position: [0, 0, 200], fov: 75 }}>
+    <View style={styles.container}>
+      <Canvas style={styles.canvas} camera={{ position: [0, 0, 200], fov: 75 }}>
         <Graph2D
           vertices={vertices}
           edges={edges}
@@ -33,3 +33,13 @@ export default function Index() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "lime",
+  },
+  canvas: {
+    flex: 1,
+  },
+});
