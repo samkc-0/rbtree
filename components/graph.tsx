@@ -1,24 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import * as THREE from "three";
-import { useRef, useLayoutEffect } from "react";
+import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import type { VertexType, EdgeType } from "@/types/graph";
 
-type VertexType = {
-  uuid: string;
-  x: number;
-  y: number;
-  z: number;
-  value: number;
-  nodeColor?: string;
-  textColor?: string;
-};
-
-type EdgeType = {
-  uuid: string;
-  source: VertexType;
-  target: VertexType;
-  color?: string;
-};
 type GraphProps = {
   vertices: VertexType[];
   edges: EdgeType[];
@@ -36,7 +21,7 @@ function Vertex2D({
   return (
     <mesh position={[x, y, z]}>
       <sphereGeometry args={[value, 32, 32]} />
-      <meshStandardMaterial color={nodeColor} />
+      <meshBasicMaterial color={nodeColor} />
       <meshBasicMaterial attach="material" color={textColor} />
     </mesh>
   );
