@@ -7,7 +7,7 @@ import { OrbitControls } from "@react-three/drei/native";
 
 import shuffle from "@/util/shuffle";
 import BinarySearchTree from "@/util/bst";
-import spaceGraph from "@/util/spaceGraph";
+import spaceGraph from "@/util/separate-vertices";
 
 const values = shuffle(Array.from({ length: 10 }, (_, i) => i + 1));
 

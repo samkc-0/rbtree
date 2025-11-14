@@ -38,6 +38,7 @@ type LineProps = {
 function Line({ start, end, color = "hotpink" }: LineProps) {
   const ref = useRef<any>(undefined);
   useFrame(() => {
+    if (!ref.current) return;
     ref.current.geometry.setFromPoints([start, end]);
   });
   return (
