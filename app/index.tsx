@@ -29,6 +29,7 @@ export default function Index() {
           position={{ x: 0, y: 0, z: 0 }}
         />
         <OrbitControls />
+        <color attach="background" args={["#f0f0f0"]} />
       </Canvas>
     </View>
   );
@@ -37,7 +38,6 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "lime",
   },
   canvas: {
     flex: 1,
