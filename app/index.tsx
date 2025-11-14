@@ -3,6 +3,7 @@ import { Graph2D } from "@/components/graph";
 import { Canvas } from "@react-three/fiber/native";
 import { useMemo } from "react";
 import { useWindowSize } from "../hooks/use-window-size";
+import { OrbitControls } from "@react-three/drei/native";
 
 import shuffle from "@/util/shuffle";
 import BinarySearchTree from "@/util/bst";
@@ -14,19 +15,20 @@ export default function Index() {
   const { width, height } = useWindowSize();
   const { vertices, edges } = useMemo(() => {
     let graph = BinarySearchTree().makeGraph(values);
-    graph = spaceGraph(graph, width, height, 80);
+    graph.vertices = spaceGraph(graph, width, height, 80);
     console.log(graph);
     return graph;
   }, []);
 
   return (
     <View style={{ flex: 1 }}>
-      <Canvas camera={{ position: [0, 0, 50], fov: 75 }}>
+      <Canvas camera={{ position: [0, 0, 200], fov: 75 }}>
         <Graph2D
           vertices={vertices}
           edges={edges}
-          position={{ x: 0, y: 0, z: -500 }}
+          position={{ x: 0, y: 0, z: 0 }}
         />
+        <OrbitControls />
       </Canvas>
     </View>
   );

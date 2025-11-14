@@ -4,6 +4,8 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { VertexType, EdgeType } from "@/types/graph";
 
+const BASE_RADIUS = 4;
+
 type GraphProps = {
   vertices: VertexType[];
   edges: EdgeType[];
@@ -18,31 +20,30 @@ function Vertex2D({
   nodeColor = "black",
   textColor = "white",
 }: Omit<VertexType, "uuid">) {
+  const r = value + BASE_RADIUS;
   return (
-    <mesh position={[x, y, z]}>
-      <sphereGeometry args={[value, 32, 32]} />
+    <mesh position={[x, y, z]} rotation={[Math.PI / 2, 0, 0]}>
+      <cylinderGeometry args={[r, r + 1, 2]} />
       <meshBasicMaterial color={nodeColor} />
     </mesh>
   );
 }
 
-function Edge({ source, target }: Omit<EdgeType, "uuid">) {
-  const ref = useRef<any>(null);
+type LineProps = {
+  start: THREE.Vector3;
+  end: THREE.Vector3;
+  color?: string;
+};
 
+function Line({ start, end, color = "hotpink" }: LineProps) {
+  const ref = useRef<any>(undefined);
   useFrame(() => {
-    if (ref.current) {
-      ref.current.geometry.setFromPoints(
-        [source, target].map(
-          (point) => new THREE.Vector3(point.x, point.y, point.z),
-        ),
-      );
-    }
+    ref.current.geometry.setFromPoints([start, end]);
   });
-
   return (
     <line ref={ref}>
       <bufferGeometry />
-      <lineBasicMaterial color="hotpink" />
+      <lineBasicMaterial color={color} />
     </line>
   );
 }
@@ -66,11 +67,20 @@ export function Graph2D(props: GraphProps) {
         </group>
       ))}
 
-      {edges.map((e, i) => (
-        <object3D key={e.uuid || i}>
-          <Edge source={e.source} target={e.target} color={e.color} />
-        </object3D>
-      ))}
+      {edges.map((e, i) => {
+        console.log(e);
+        const source = vertices.find((v) => v.uuid === e.source);
+        if (!source) return;
+        const target = vertices.find((v) => v.uuid === e.target)!;
+        if (!target) return;
+        const start = new THREE.Vector3(source.x, source.y, position.z);
+        const end = new THREE.Vector3(target.x, target.y, position.z);
+        return (
+          <object3D key={e.uuid || i}>
+            <Line start={start} end={end} color={e.color} />
+          </object3D>
+        );
+      })}
     </group>
   );
 }

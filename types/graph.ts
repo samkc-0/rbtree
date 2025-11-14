@@ -10,8 +10,8 @@ export type VertexType = {
 
 export type EdgeType = {
   uuid: string;
-  source: VertexType;
-  target: VertexType;
+  source: string;
+  target: string;
   color?: string;
 };
 

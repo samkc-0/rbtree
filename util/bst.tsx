@@ -78,23 +78,25 @@ export default function BinarySearchTree(): BSTModule {
     values: number[],
   ): { vertices: VertexType[]; edges: EdgeType[] } => {
     const root = fromArray(values);
-
     const vertices: VertexType[] = [];
+    const edges: EdgeType[] = [];
+
     traverse(root, (n) => {
       const v = nodeToVertex(n);
       vertices.push(v);
-    });
-
-    const edges: EdgeType[] = [];
-    traverse(root, (n) => {
-      const source = vertices.find((v) => v.uuid === n.uuid)!;
       if (n.left !== undefined) {
-        const target = vertices.find((v) => v.uuid === n.left!.uuid)!;
-        edges.push({ uuid: randomUUID(), source, target });
+        edges.push({
+          uuid: randomUUID(),
+          source: n.uuid,
+          target: n.left!.uuid,
+        });
       }
       if (n.right !== undefined) {
-        const target = vertices.find((v) => v.uuid === n.right!.uuid)!;
-        edges.push({ uuid: randomUUID(), source, target });
+        edges.push({
+          uuid: randomUUID(),
+          source: n.uuid,
+          target: n.right!.uuid,
+        });
       }
     });
 
