@@ -80,6 +80,7 @@ export default function BinarySearchTree(): BSTModule {
     const root = fromArray(values);
     const vertices: VertexType[] = [];
     const edges: EdgeType[] = [];
+    // TODO: edges is just a hashmap of node uuid to left uuid & right uuid
 
     traverse(root, (n) => {
       const v = nodeToVertex(n);

@@ -1,6 +1,7 @@
 import { Vector3 } from "three";
 import type { VertexType, EdgeType } from "@/types/graph";
 import { Line } from "@react-three/drei/native";
+import { useState } from "react";
 
 const BASE_RADIUS = 6;
 
@@ -19,11 +20,12 @@ function Vertex2D({
   textColor = "white",
 }: Omit<VertexType, "uuid">) {
   const r = value + BASE_RADIUS;
+  const [color, setColor] = useState<string>(nodeColor);
   return (
     <object3D position={[x, y, z]}>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[r, r, 5]} />
-        <meshBasicMaterial color={nodeColor} />
+        <meshBasicMaterial color={color} />
       </mesh>
     </object3D>
   );

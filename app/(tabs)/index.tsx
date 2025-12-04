@@ -12,31 +12,34 @@ import spaceGraph from "@/util/separate-vertices";
 const values = shuffle(Array.from({ length: 10 }, (_, i) => i + 1));
 
 export default function Index() {
-  const { width, height } = useWindowSize();
-  const { vertices, edges } = useMemo(() => {
+  const size = useWindowSize();
+  // when does ready get updated again though?
+  const graph = useMemo(() => {
+    if (size.width == undefined || size.height == undefined) return undefined;
     let graph = BinarySearchTree().makeGraph(values);
-    graph.vertices = spaceGraph(graph, width, height);
+    graph.vertices = spaceGraph(graph, size.width, size.height);
     return graph;
-  }, []);
+  }, [size.width, size.height, values]);
 
+  if (!graph) return undefined;
   return (
     <View style={styles.container}>
       <Canvas style={styles.canvas}>
         <OrthographicCamera
           makeDefault
           zoom={50}
-          top={height / 2}
-          bottom={-height / 2}
-          left={-width / 2}
-          right={width / 2}
+          top={size.height / 2}
+          bottom={-size.height / 2}
+          left={-size.width / 2}
+          right={size.width / 2}
           near={1}
           far={2000}
           position={[0, 0, 200]}
         />
-        <Bounds fit clip observe margin={1.2} maxDuration={10}>
+        <Bounds fit clip observe margin={1.2} maxDuration={0}>
           <Graph2D
-            vertices={vertices}
-            edges={edges}
+            vertices={graph.vertices}
+            edges={graph.edges}
             position={{ x: 0, y: 0, z: 0 }}
           />
         </Bounds>
