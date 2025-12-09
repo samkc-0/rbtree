@@ -30,7 +30,7 @@ function Vertex2D({
   const planeIntersectPoint = useRef<Vector3>(new Vector3());
   const ref = useRef<Object3D>(null!);
 
-  const translate = useGraph((state) => state.translate);
+  const { translateVertex, setVertexPosition } = useGraph();
 
   const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
     console.log(`pointer down on vertex ${uuid}`);
@@ -50,7 +50,12 @@ function Vertex2D({
     event.ray.intersectPlane(floorPlane.current, planeIntersectPoint.current);
     const dx = planeIntersectPoint.current.x - x;
     const dy = planeIntersectPoint.current.y - y;
-    translate(uuid, dx, dy);
+    setVertexPosition(
+      uuid,
+      planeIntersectPoint.current.x,
+      planeIntersectPoint.current.y,
+      z,
+    );
   };
 
   return (

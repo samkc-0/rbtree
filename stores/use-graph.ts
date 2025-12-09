@@ -2,24 +2,30 @@
 import { create } from "zustand";
 import type { GraphType, VertexType, EdgeType } from "@/types/graph";
 
-type GraphState = {
+interface GraphState {
   vertices: VertexType[];
   edges: EdgeType[];
+
+  // Actions
   setGraph: (graph: GraphType) => void;
-  translate: (uuid: string, dx: number, dy: number, dz?: number) => void;
-  updateVertex: (uuid: string, updates: Partial<VertexType>) => void;
+  translateVertex: (uuid: string, dx: number, dy: number, dz?: number) => void;
+  setVertexPosition: (uuid: string, x: number, y: number, z?: number) => void;
   getVertex: (uuid: string) => VertexType | undefined;
-};
+  getEdgesForVertex: (uuid: string) => EdgeType[];
+}
 
 export const useGraph = create<GraphState>((set, get) => ({
   vertices: [],
   edges: [],
 
-  setGraph: (graph: GraphType) => {
-    set({ vertices: graph.vertices, edges: graph.edges });
+  setGraph: (graph) => {
+    set({
+      vertices: graph.vertices,
+      edges: graph.edges,
+    });
   },
 
-  translate: (uuid: string, dx: number, dy: number, dz: number = 0) => {
+  translateVertex: (uuid, dx, dy, dz = 0) => {
     set((state) => ({
       vertices: state.vertices.map((vertex) =>
         vertex.uuid === uuid
@@ -34,15 +40,26 @@ export const useGraph = create<GraphState>((set, get) => ({
     }));
   },
 
-  updateVertex: (uuid: string, updates: Partial<VertexType>) => {
+  setVertexPosition: (uuid, x, y, z) => {
     set((state) => ({
       vertices: state.vertices.map((vertex) =>
-        vertex.uuid === uuid ? { ...vertex, ...updates } : vertex,
+        vertex.uuid === uuid
+          ? {
+              ...vertex,
+              x,
+              y,
+              z: z ?? vertex.z,
+            }
+          : vertex,
       ),
     }));
   },
 
-  getVertex: (uuid: string) => {
+  getVertex: (uuid) => {
     return get().vertices.find((v) => v.uuid === uuid);
+  },
+
+  getEdgesForVertex: (uuid) => {
+    return get().edges.filter((e) => e.source === uuid || e.target === uuid);
   },
 }));
