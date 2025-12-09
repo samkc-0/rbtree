@@ -4,6 +4,7 @@ import { Canvas } from "@react-three/fiber/native";
 import { useMemo } from "react";
 import { useWindowSize } from "@/hooks/use-window-size";
 import { OrthographicCamera, Bounds } from "@react-three/drei/native";
+import { useGraph } from "@/stores/use-graph";
 
 import shuffle from "@/util/shuffle";
 import BinarySearchTree from "@/util/bst";
