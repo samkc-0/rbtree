@@ -1,7 +1,7 @@
 import { View, StyleSheet } from "react-native";
 import { Graph2D } from "@/components/graph";
 import { Canvas } from "@react-three/fiber/native";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useWindowSize } from "@/hooks/use-window-size";
 import { OrthographicCamera, Bounds } from "@react-three/drei/native";
 import { useGraph } from "@/stores/use-graph";
@@ -14,6 +14,8 @@ const values = shuffle(Array.from({ length: 10 }, (_, i) => i + 1));
 
 export default function Index() {
   const size = useWindowSize();
+  const { vertices, edges, setGraph } = useGraph();
+
   // when does ready get updated again though?
   const graph = useMemo(() => {
     if (size.width == undefined || size.height == undefined) return undefined;
@@ -22,7 +24,12 @@ export default function Index() {
     return graph;
   }, [size.width, size.height, values]);
 
+  useEffect(() => {
+    if (graph) setGraph(graph);
+  }, [graph, setGraph]);
+
   if (!graph) return undefined;
+
   return (
     <View style={styles.container}>
       <Canvas style={styles.canvas}>
@@ -39,8 +46,8 @@ export default function Index() {
         />
         <Bounds fit clip observe margin={1.2} maxDuration={0}>
           <Graph2D
-            vertices={graph.vertices}
-            edges={graph.edges}
+            vertices={vertices}
+            edges={edges}
             position={{ x: 0, y: 0, z: 0 }}
           />
         </Bounds>

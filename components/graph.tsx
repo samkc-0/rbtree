@@ -4,6 +4,7 @@ import { Line } from "@react-three/drei/native";
 import { useFrame } from "@react-three/fiber/native";
 import { useRef, useState } from "react";
 import { ThreeEvent } from "@react-three/fiber";
+import { useGraph } from "@/stores/use-graph";
 
 const BASE_RADIUS = 6;
 
@@ -25,10 +26,11 @@ function Vertex2D({
   const r = value + BASE_RADIUS;
   const [color, setColor] = useState<string>(nodeColor);
   const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [position, setPosition] = useState({ x, y, z });
   const floorPlane = useRef<Plane>(new Plane(new Vector3(0, 0, 1), 0));
   const planeIntersectPoint = useRef<Vector3>(new Vector3());
   const ref = useRef<Object3D>(null!);
+
+  const translate = useGraph((state) => state.translate);
 
   const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
     console.log(`pointer down on vertex ${uuid}`);
@@ -46,18 +48,16 @@ function Vertex2D({
   const handlePointerMove = (event: ThreeEvent<PointerEvent>) => {
     if (!isDragging) return;
     event.ray.intersectPlane(floorPlane.current, planeIntersectPoint.current);
-    setPosition({
-      x: planeIntersectPoint.current.x,
-      y: planeIntersectPoint.current.y,
-      z: z,
-    });
+    const dx = planeIntersectPoint.current.x - x;
+    const dy = planeIntersectPoint.current.y - y;
+    translate(uuid, dx, dy);
   };
 
   return (
     <object3D
       ref={ref}
       onPointerMove={handlePointerMove}
-      position={[position.x, position.y, position.z]}
+      position={[x, y, z]}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
     >
